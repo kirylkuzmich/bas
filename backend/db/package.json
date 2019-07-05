@@ -1,0 +1,14 @@
+{
+  "name": "deploy",
+  "dependencies": {
+    "@sap/hdi-deploy": "^3.8.2",
+    "request-promise": "^4.2.4"
+  },
+  "engines": {
+    "node": "^8"
+  },
+  "scripts": {
+    "postinstall": "node .build.js",
+    "start": "node node_modules/@sap/hdi-deploy/deploy.js"
+  }
+}

@@ -1,0 +1,47 @@
+﻿ID: kuz_backend
+_schema-version: 3.1.0
+version: 1.0.0
+
+modules:
+    -
+        name: kuz_db
+        type: hdb
+        path: db
+        provides:
+            - {name: kuz_db, public: true}
+        parameters:
+            memory: 256M
+            disk-quota: 256M
+        requires:
+            - {name: kuz_hdi}
+    -
+        name: kuz_srv
+        type: nodejs
+        path: srv
+        properties:
+            XS_APP_LOG_LEVEL: debug
+        parameters:
+            memory: 256M
+            disk-quota: 1024M
+        provides:
+            - {name: kuz_srv, public: true, properties: {url: '${default-url}'}}
+        requires:
+            - {name: kuz_db}
+            - {name: kuz_hdi}
+            - {name: kuz_uaa}
+            - {name: kuz_dest}
+            - {name: kuz_conn}
+
+resources:
+    -
+        name: kuz_hdi
+        type: org.cloudfoundry.existing-service
+    -
+        name: kuz_uaa
+        type: org.cloudfoundry.existing-service
+    -
+        name: kuz_dest
+        type: org.cloudfoundry.existing-service
+    -
+        name: kuz_conn
+        type: org.cloudfoundry.existing-service
