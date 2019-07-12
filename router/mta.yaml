@@ -1,0 +1,42 @@
+ID: kuz_router
+_schema-version: 3.1.0
+version: 1.0.0
+
+modules:
+    -
+        name: router
+        type: nodejs
+        path: ./
+        properties:
+            XS_APP_LOG_LEVEL: debug
+        build-parameters:
+            ignore: [".git/", ".idea/", ".gitignore", ".gitlab-ci.yml", "mta.jar", "mta.yaml"]
+        parameters:
+            disk-quota: 256M
+            memory: 128M
+        requires:
+            - {name: kuz_router}
+            - {name: kuz_conn}
+            - {name: kuz_dest}
+            - {name: kuz_uaa}
+            - {name: kuz_srv, group: destinations, properties: {name: kuz_srv, url: '~{url}', forwardAuthToken: true}}
+resources:
+    -
+        name: kuz_srv
+        type: configuration
+        parameters:
+            provider-nid: mta
+            provider-id: 'kuz_backend:kuz_srv'
+            version: '>=0.0.1'
+    -
+        name: kuz_dest
+        type: org.cloudfoundry.existing-service
+    -
+        name: kuz_conn
+        type: org.cloudfoundry.existing-service
+    -
+        name: kuz_uaa
+        type: org.cloudfoundry.existing-service
+    -
+        name: kuz_router
+        type: org.cloudfoundry.existing-service

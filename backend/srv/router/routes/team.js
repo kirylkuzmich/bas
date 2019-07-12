@@ -11,7 +11,8 @@ module.exports = () => {
         try {
             const db = new dbClass(req.db);
             const sSql = `SELECT * FROM KKUZ_TEAM`;
-            var result = await db.getVal(sSql);
+            var result = await db.executeUpdate(sSql);
+            console.log(result);
             res.type("application/json").status(201).send(JSON.stringify(result));
         } catch (e) {
             next(e);
@@ -21,6 +22,8 @@ module.exports = () => {
     app.post("/", async (req, res, next) => {
         try {
             const db = new dbClass(req.db);
+
+            console.log(req.body);
 
             const oTeam = req.body;
 			oTeam.tmid = await db.getNextval("tmid");

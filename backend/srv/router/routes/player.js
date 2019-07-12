@@ -12,8 +12,10 @@ module.exports = () => {
     app.get("/", async (req, res, next) => {
         try {
             const db = new dbClass(req.db);
-            const sSql = `SELECT * FROM KKUZ_PLAYER`;
-            var result = await db.getVal(sSql);
+            const sSql = `SELECT KKUZ_PLAYER.PLID, KKUZ_PLAYER.NAME, KKUZ_PLAYER.POSITION, KKUZ_PLAYER.CREATEDON, KKUZ_PLAYER.CREATEDBY, KKUZ_TEAM.NAME AS TEAM
+             FROM KKUZ_PLAYER INNER JOIN KKUZ_TEAM ON KKUZ_PLAYER.TMID = KKUZ_TEAM.TMID`;
+            var result = await db.executeUpdate(sSql);
+            
             res.type("application/json").status(201).send(JSON.stringify(result));
         } catch (e) {
             next(e);
@@ -27,11 +29,11 @@ module.exports = () => {
             const oPlayer = req.body;
 			oPlayer.plid = await db.getNextval("plid");
 
-            const sSql = `INSERT INTO "KKUZ_PLAYER" VALUES(?,?,?,?,?,?)`;
+            const sSql = `INSERT INTO KKUZ_PLAYER VALUES(?,?,?,?,?,?)`;
 			const aValues = [ oPlayer.plid, oPlayer.tmid, oPlayer.name, oPlayer.position, oPlayer.createdon, oPlayer.createdby ];
 
-
             await db.executeUpdate(sSql, aValues);
+            console.log(aValues);
 
             res.type("application/json").status(201).send(JSON.stringify(oPlayer));
         } catch (e) {

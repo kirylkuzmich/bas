@@ -1,0 +1,48 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:f="sap.ui.layout.form" xmlns:core="sap.ui.core"
+    controllerName="player_display.controller.Master">
+    <Page showHeader="false">
+        <Table busyIndicatorDelay="0" growing="true" growingScrollToLoad="true" noDataText="{i18n>tableNoDataText}"
+            items="{players>/}" width="auto">
+            <headerToolbar>
+                <Toolbar>
+                    <Title id="idCountTitle" />
+                    <ToolbarSpacer />
+                    <Button icon="sap-icon://action-settings" tooltip="{i18n>onSettings}" press="onSettings" />
+                </Toolbar>
+            </headerToolbar>
+            <columns>
+                <Column width="20%">
+                    <Label text="{i18n>plid}" design="Bold" />
+                </Column>
+                <Column>
+                    <Label text="{i18n>team}" design="Bold" />
+                </Column>
+                <Column>
+                    <Label text="{i18n>name}" design="Bold" />
+                </Column>
+                <Column>
+                    <Label text="{i18n>position}" design="Bold" />
+                </Column>
+                <Column>
+                    <Label text="{i18n>createdon}" design="Bold" />
+                </Column>
+                <Column>
+                    <Label text="{i18n>createdby}" design="Bold" />
+                </Column>
+            </columns>
+            <items>
+                <ColumnListItem type="Navigation" press="onGoToDetail">
+                    <cells>
+                        <Text text="{players>PLID}" />
+                        <Text text="{players>TEAM}" />
+                        <Text text="{players>NAME}" />
+                        <Text text="{players>POSITION}" />
+                        <Text text="{players>CREATEDON}" />
+                        <Text text="{players>CREATEDBY}" />
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+    </Page>
+
+</mvc:View>

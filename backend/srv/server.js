@@ -11,13 +11,14 @@ const logging = require("@sap/logging");
 const compression = require("compression");
 const cds = require("@sap/cds");
 const bodyParser = require('body-parser');
+const passport = require("passport");
 
-// if (process.argv[2] === "--debug") {
-//     global.DEBUG_MODE = true;
-//     console.log(process.argv[2]);
-//     //Load environment variables for CLOUD
-//     xsenv.loadEnv("debug-env.json");
-// }
+if (process.argv[2] === "--debug") {
+    global.DEBUG_MODE = true;
+    console.log(process.argv[2]);
+    //Load environment variables for CLOUD
+    xsenv.loadEnv("debug-env.json");
+}
 
 https.globalAgent.options.ca = xsenv.loadCertificates();
 global.__base = __dirname + "/";
@@ -41,17 +42,28 @@ app.use(compression({
 
 // let hanaOptions = {
 //     hana: {
-//         host: "10.253.93.93",
-//         port: "30041",
+//         host: "zeus.hana.prod.eu-central-1.whitney.dbaas.ondemand.com",
+//         port: "21513",
 //         encrypt: true,
 //         sslValidateCertificate: false,
 //         driver: "com.sap.db.jdbc.Driver",
-//         url: "jdbc:sap://10.253.93.93:30041/?currentschema=KUZ_SCP",
-//         schema: "KUZ_SCP",
-//         hdi_user: "SBSS_10833640270122114459111887732432709988446507327479785702000065634",
-//         hdi_password: "Mi8mjzlVEyru9fu7-hpRmKIpqFexZjvCAsAtjJmyOHhyIlJs6fVUcTiiIBiqNHeqJOTT6mIUN7BbQDR2J7ITTzIVVE9KYxrEIXfE3432N55b6VrDcoIdMJthYgUGLrDA",
-//         user: "SBSS_13377071490103609428252630190038614441360904268573424909405821587",
-//         password: "Cu53jWfxfxIxwEhQ-OJi7MwV8bm4zdgBoN_-WoLekgREHaiGnAP4oi5aBL61KlA2RbZv_YEk1uwy56eXnG3b-IoQJbjdkWGCjmu2eZuOaQC72niKSZwkqAbwwqxc_tw_"
+//         url: "jdbc:sap://zeus.hana.prod.eu-central-1.whitney.dbaas.ondemand.com:21513?encrypt=true&validateCertificate=false&currentschema=SHARED",
+//         schema: "SHARED",
+//         hdi_user: "SHARED_CBJPD5ZEY2VWMI2TMU60N5KLH_DT",
+//         hdi_password: "Xo1EIbTesySzHTSrzclc2oSsEA6MtIm89fBYN9zajxqfK0v88Rerhb-Az8jOioO6.Bv4Vr7JzQrQtyasZZaf.ykgNrnwBI1qZQk6IVolNfkLIj2n.y.kgCpDk-1ongR1",
+//         user: "SHARED_CBJPD5ZEY2VWMI2TMU60N5KLH_RT",
+//         password: "Tk9t.8bpaTPELse31B9_0V4D6aZ_2wUN7tlt27KG7OE9EF56uD3qUH-wAmg_s4QA-9bnvUoM-0NlTc-OnpLG3081H2UipQbnSAJuC6-voTcj0kNmWlBp3pw_ihrNK8z."
+//         // host: "10.253.93.93",
+//         // port: "30041",
+//         // encrypt: true,
+//         // sslValidateCertificate: false,
+//         // driver: "com.sap.db.jdbc.Driver",
+//         // url: "jdbc:sap://10.253.93.93:30041/?currentschema=KUZ_SCP",
+//         // schema: "KUZ_SCP",
+//         // hdi_user: "SBSS_56956787147244657957514585860081083712909996484604751957773851173",
+//         // hdi_password: "Pk0C3Fwm43hu-uZhqDtGMH38SXFmX_jMVFWQDbdNivYefr2qTRE6vaLzaekpPiVW1n2upLRzW3nDqbUQ7.Odv54ZnWnNFwq-c305nUuc_J4llhsDyATAxsyp_B9NSD1Q",
+//         // user: "SBSS_49392493088571829743390017372681635194808487821779472565023709359",
+//         // password: "Ux7KhDCnLVRTvfAZRfspTAO4v.XprMBtpEFMfhDf7QMzMDWNsIWL2djok_XD92cEhqhunhbjd9hO2EfpjYTUw2dH6k04JN94o46H1hxSM_CemMgpvRBn_HmBhBMlLVak"
 //     }
 // };
 
@@ -82,6 +94,22 @@ app.use(logging.middleware({
     appContext: appContext,
     logNetwork: true
 }));
+
+//Build a JWT Strategy from the bound UAA resource
+passport.use("JWT", new xssec.JWTStrategy(xsenv.getServices({
+    uaa: {
+        tag: "xsuaa"
+    }
+}).uaa));
+app.use(passport.initialize());
+
+if (!global.DEBUG_MODE) {
+    app.use(
+        passport.authenticate("JWT", {
+            session: false
+        })
+    );
+}
 
 //Error handling
 app.use(function (err, req, res, next) {

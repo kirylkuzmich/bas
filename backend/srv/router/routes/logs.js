@@ -11,7 +11,7 @@ module.exports = () => {
         try {
             const db = new dbClass(req.db);
             const sSql = `SELECT * FROM KKUZ_LOGS`;
-            var result = await db.getVal(sSql);
+            var result = await db.executeUpdate(sSql);
             res.type("application/json").status(201).send(JSON.stringify(result));
         } catch (e) {
             next(e);
